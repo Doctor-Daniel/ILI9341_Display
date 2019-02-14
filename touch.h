@@ -47,11 +47,11 @@
 #define	swap(a, b)		{uint16_t t = a ; a = b; b = t; }
 
 // PINs definitions
-#define		TOUCH_SCK	(1<<5)												// CLK
-#define 	TOUCH_MISO	(1<<4)												// MISO
-#define 	TOUCH_MOSI	(1<<3)												// MOSI
-#define 	TOUCH_IRQ	(1<<5)												// PENIRQ
-#define 	TOUCH_CS	(1<<7)												// CS
+#define		TOUCH_SCK	(1<<7)												// CLK
+#define 	TOUCH_MISO	(1<<6)												// MISO
+#define 	TOUCH_MOSI	(1<<5)												// MOSI
+#define 	TOUCH_IRQ	(1<<1)												// PENIRQ
+#define 	TOUCH_CS	(1<<0)												// CS
 
 // PORTs definitions
 #define 	TOUCH_SCK_PORT	PORTB
@@ -61,10 +61,10 @@
 #define 	TOUCH_MISO_PORT	PORTB
 #define 	TOUCH_MISO_DIR	DDRB
 #define 	TOUCH_MISO_PIN	PINB
-#define 	TOUCH_CS_PORT	PORTD
-#define 	TOUCH_CS_DIR	DDRD
-#define 	TOUCH_IRQ_PORT	PORTD
-#define 	TOUCH_IRQ_DIR	DDRD
+#define 	TOUCH_CS_PORT	PORTB
+#define 	TOUCH_CS_DIR	DDRB
+#define 	TOUCH_IRQ_PORT	PORTB
+#define 	TOUCH_IRQ_DIR	DDRB
 
 // MACROs definitions
 #define 	TOUCH_SCK_LO	TOUCH_SCK_PORT &= ~TOUCH_SCK
@@ -73,7 +73,7 @@
 #define 	TOUCH_MOSI_HI	TOUCH_MOSI_PORT |= TOUCH_MOSI
 #define 	TOUCH_CS_LO		TOUCH_CS_PORT &= ~TOUCH_CS
 #define 	TOUCH_CS_HI		TOUCH_CS_PORT |= TOUCH_CS
-#define		TOUCH_MISO_X	TOUCH_MISO_PIN & TOUCH_MISO
+#define		TOUCH_MISO_X	(TOUCH_MISO_PIN & TOUCH_MISO) >> PB6
 
 // Touch structure
 typedef struct

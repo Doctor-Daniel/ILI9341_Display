@@ -9,7 +9,7 @@
 
 // RRRRRGGGGGGBBBBB
 // 5    6     5
-#define BLACK			0x0000
+ #define BLACK			0x0000
 #define WHITE			0xFFFF
 #define BLUE			0x001F
 #define BRED			0xF81F

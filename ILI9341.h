@@ -59,7 +59,7 @@
 //#define 	TFT_CS_PORT		PORTD
 //#define 	TFT_CS_DIR		DDRD
 //#define 	TFT_MISO_PORT	PORTB
-//#define 	TFT_MISO_PIN	PINB
+#define 	TFT_MISO_PIN	PINB
 //#define 	TFT_MISO_DIR	DDRB
 //#endif
 
@@ -74,7 +74,7 @@
 #define 	TFT_DC_HI	TFT_DC_PORT |= TFT_DC
 #define 	TFT_CS_LO	TFT_CS_PORT &= ~TFT_CS
 #define 	TFT_CS_HI	TFT_CS_PORT |= TFT_CS
-//#define		TFT_MISO_X	TFT_MISO_PIN & TFT_MISO
+#define		TFT_MISO_X	TFT_MISO_PIN & TFT_MISO
 
 // Types & Variables
 enum direction_t {HORIZONTAL, VERTICAL, UP_SLOPE, DN_SLOPE};

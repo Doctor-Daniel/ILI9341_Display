@@ -32,17 +32,17 @@ cal_t ee_touch_cal EEMEM;
 point_t EEMEM ee_cal_points[3] =											// Three calibration points
 {
     {20, 20},
-    {300, 120},
+    {290, 120},
     {160, 220}
 };
 
 void XPT2046_init_io(void)
 {
     // This is already done in TFT section
-    //TOUCH_MOSI_DIR |= TOUCH_MOSI;											// TFT_MOSI pin as output
-    //TOUCH_SCK_DIR |= TOUCH_SCK;											// TFT_SCK pin as output
-    //TOUCH_MOSI_PORT |= TOUCH_MOSI;										// Hi state
-    //TOUCH_SCK_PORT |= TOUCH_SCK;
+    TOUCH_MOSI_DIR |= TOUCH_MOSI;											// TFT_MOSI pin as output
+    TOUCH_SCK_DIR |= TOUCH_SCK;											// TFT_SCK pin as output
+    TOUCH_MOSI_PORT |= TOUCH_MOSI;										// Hi state
+    TOUCH_SCK_PORT |= TOUCH_SCK;
 #if USE_TOUCH_CS == 1														// If TFT_CS in use
     TOUCH_CS_DIR |= TOUCH_CS;
     TOUCH_CS_PORT |= TOUCH_CS;
