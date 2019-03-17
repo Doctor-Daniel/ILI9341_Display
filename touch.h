@@ -1,7 +1,7 @@
 /*
  * touch.h
  *
- *  Author: kostuch@skeletondevices.com
+ * Przerobiona wersja. Glownie nowe definicje dla pinow (za pomoca _BV() )
  */
 
 #include <avr/eeprom.h>
@@ -47,11 +47,11 @@
 #define	swap(a, b)		{uint16_t t = a ; a = b; b = t; }
 
 // PINs definitions
-#define		TOUCH_SCK	(1<<7)												// CLK
-#define 	TOUCH_MISO	(1<<6)												// MISO
-#define 	TOUCH_MOSI	(1<<5)												// MOSI
-#define 	TOUCH_IRQ	(1<<1)												// PENIRQ
-#define 	TOUCH_CS	(1<<0)												// CS
+#define		TOUCH_SCK	PB7												// CLK
+#define 	TOUCH_MISO	PB6											// MISO
+#define 	TOUCH_MOSI	PB5												// MOSI
+#define 	TOUCH_IRQ	PB1												// PENIRQ
+#define 	TOUCH_CS	PB0												// CS
 
 // PORTs definitions
 #define 	TOUCH_SCK_PORT	PORTB
@@ -67,12 +67,12 @@
 #define 	TOUCH_IRQ_DIR	DDRB
 
 // MACROs definitions
-#define 	TOUCH_SCK_LO	TOUCH_SCK_PORT &= ~TOUCH_SCK
-#define 	TOUCH_SCK_HI	TOUCH_SCK_PORT |= TOUCH_SCK
-#define 	TOUCH_MOSI_LO	TOUCH_MOSI_PORT &= ~TOUCH_MOSI
-#define 	TOUCH_MOSI_HI	TOUCH_MOSI_PORT |= TOUCH_MOSI
-#define 	TOUCH_CS_LO		TOUCH_CS_PORT &= ~TOUCH_CS
-#define 	TOUCH_CS_HI		TOUCH_CS_PORT |= TOUCH_CS
+#define 	TOUCH_SCK_LO	TOUCH_SCK_PORT &= ~(_BV(TOUCH_SCK))
+#define 	TOUCH_SCK_HI	TOUCH_SCK_PORT |= _BV(TOUCH_SCK)
+#define 	TOUCH_MOSI_LO	TOUCH_MOSI_PORT &= ~(_BV(TOUCH_MOSI))
+#define 	TOUCH_MOSI_HI	TOUCH_MOSI_PORT |= _BV(TOUCH_MOSI)
+#define 	TOUCH_CS_LO		TOUCH_CS_PORT &= ~(_BV(TOUCH_CS))
+#define 	TOUCH_CS_HI		TOUCH_CS_PORT |= _BV(TOUCH_CS)
 #define		TOUCH_MISO_X	(TOUCH_MISO_PIN & TOUCH_MISO) >> PB6
 
 // Touch structure

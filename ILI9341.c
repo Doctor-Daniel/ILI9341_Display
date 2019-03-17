@@ -1,9 +1,9 @@
 ﻿/*
  * ILI9341.c
  *
- *  Author: kostuch@skeletondevices.com
- *	Version 0.9
- */
+ *	Definicje funkcji do wyswietlacza TFT ILI9341 
+ *
+ */ 
 
 #include <avr/io.h>
 #include <avr/eeprom.h>
@@ -19,78 +19,74 @@ static uint8_t ILI9341_rd_cmd(uint8_t addr, uint8_t parameter);
 static uint8_t ILI9341_xchg_data(uint8_t data);
 static void ILI9341_wr_cmd(uint8_t cmd);
 
-/* Reset LCD */
-void ILI9341_reset()
+
+void ILI9341_reset()				// Reset wyswietlacza
 {
-    TFT_RST_LO;																// 10ms reset pulse (if in use)
+    TFT_RST_LO;						
     _delay_ms(10);
     TFT_RST_HI;
 }
 
-/* Activate via ChipSelect signal */
-void ILI9341_select()
+
+void ILI9341_select()		// Aktywacja wyswietlacza
 {
     TFT_CS_LO;
 }
 
-/* Deactivate via ChipSelect signal */
-void ILI9341_deselect()
+void ILI9341_deselect()		// Dezaktywacja wyswietlacza
 {
     TFT_CS_HI;
 }
 
-/* Init pins for SPI */
-static void ILI9341_init_io()
+static void ILI9341_init_io()				// Inicjalizacja szyny SPI do wyswietlacza TFT
 {
-    TFT_MOSI_DIR |= TFT_MOSI;												// TFT_MOSI pin as output
-    TFT_SCK_DIR |= TFT_SCK;													// TFT_SCK pin as output
-    TFT_DC_DIR |= TFT_DC;													// TFT_DC pin as output
-    TFT_MOSI_PORT |= TFT_MOSI;												// Hi state
-    TFT_SCK_PORT |= TFT_SCK;
-    TFT_MISO_DIR &= ~TFT_MISO;												// TFT MISO pin as input
-    TFT_MISO_PORT |= TFT_MISO;												// Pullup
-#if USE_TFT_CS == 1															// If TFT_CS in use
-    TFT_CS_DIR |= TFT_CS;
-    TFT_CS_PORT |= TFT_CS;
+    TFT_MOSI_DDR |= _BV(TFT_MOSI);			// Kierunek dla pinow MOSI, SCK, D/C jako wyjscie
+    TFT_SCK_DDR |= _BV(TFT_SCK);			
+    TFT_DC_DDR |= _BV(TFT_DC);				
+	TFT_MISO_DDR &= ~(_BV(TFT_MISO));		// Kierunek pinu MISO jako wejscie
+    
+	TFT_MOSI_PORT |= _BV(TFT_MOSI);			// Stan wysoki na MOSI i SCK
+    TFT_SCK_PORT |= _BV(TFT_SCK);			 
+    TFT_MISO_PORT |= _BV(TFT_MISO);			// na MISO musi byc pull-up
+
+#if USE_TFT_CS == 1							// Jesli uzywany pin CS:
+    TFT_CS_DDR |= _BV(TFT_CS);				// Kierunek dla pinu CS jako wyjscie
+    TFT_CS_PORT |= _BV(TFT_CS);				
 #endif
-    TFT_RST_DIR |= TFT_RST;													// TFT_RST pin as output
-    TFT_RST_PORT |= TFT_RST;												// Hi state
-#ifdef USE_HARD_SPI
+    TFT_RST_DDR |= _BV(TFT_RST);			// TFT_RST pin as output
+    TFT_RST_PORT |= _BV(TFT_RST);			// Hi state
+
     SPI_init();
-#else
-#endif
+
 }
 
-/* Write command */
-static void ILI9341_wr_cmd(uint8_t command)
+static void ILI9341_wr_cmd(uint8_t command)	// wyslij komende
 {
-    TFT_DC_LO;																// TFT_DC LOW - command
-#if USE_TFT_CS == 1															// If TFT_CS in use
+    TFT_DC_LO;								// TFT_DC LOW - komenda
+#if USE_TFT_CS == 1							// ustawiany w ILI9341.h
     TFT_CS_LO;
 #endif
-    SPI_rxtx(command, TFT);													// Send (exchange) byte via SPI
-#if USE_TFT_CS == 1															// If TFT_CS in use
+    SPI_rxtx(command, TFT);					// Wymiana bajtow po SPI
+#if USE_TFT_CS == 1							
     TFT_CS_HI;
 #endif
 }
 
-/* Exchange data */
-static uint8_t ILI9341_xchg_data(uint8_t data)
+static uint8_t ILI9341_xchg_data(uint8_t data)	// wymiana danych
 {
 	uint8_t rx_data;
-	TFT_DC_HI;																// TFT_DC HIGH - data
-	#if USE_TFT_CS == 1														// If TFT_CS in use
+	TFT_DC_HI;								// TFT_DC HIGH - dane
+	#if USE_TFT_CS == 1			
 	TFT_CS_LO;
 	#endif
-	rx_data = SPI_rxtx(data, TFT);											// Receive (and send) byte via SPI
-	#if USE_TFT_CS == 1														// If TFT_CS in use
+	rx_data = SPI_rxtx(data, TFT);			// Odbior bajtow po SPI
+	#if USE_TFT_CS == 1
 	TFT_CS_HI;
 	#endif
 	return rx_data;
 }
 
-/* Initialisation */
-void ILI9341_init()
+void ILI9341_init()		// Inicjalizacja wyswietlacza ILI9341
 {
     ILI9341_init_io();
     TFT_RST_LO;
@@ -150,7 +146,7 @@ void ILI9341_init()
 static uint8_t ILI9341_rd_cmd(uint8_t addr, uint8_t parameter)
 {
 	TFT_DC_LO;																// TFT_DC LOW - command
-	#if USE_TFT_CS == 1														// If TFT_CS in use
+	#if USE_TFT_CS == 1													
 	TFT_CS_LO;
 	#endif
 	SPI_rxtx(0xD9, TFT);													// Magic command
@@ -159,7 +155,7 @@ static uint8_t ILI9341_rd_cmd(uint8_t addr, uint8_t parameter)
 	TFT_DC_LO;
 	SPI_rxtx(addr, TFT);
 	uint8_t data = SPI_rxtx(0, TFT);										// Send dummy byte and receive answer
-	#if USE_TFT_CS == 1														// If TFT_CS in use
+	#if USE_TFT_CS == 1													
 	TFT_CS_HI;
 	#endif
 	return data;
@@ -178,19 +174,6 @@ uint32_t ILI9341_rd_id(void)
     return data;
 }
 
-/* Read raw data from RAM in LCD */
-uint16_t ILI9341_rd_ram(uint16_t x, uint16_t y)
-{
-    // THIS FUNCTION DO NOT WORK YET!!! TODO
-	uint16_t data;
-    ILI9341_wr_cmd(ILI9341_MEMORY_READ);
-	ILI9341_rd_dummy();
-	data = ILI9341_xchg_data(255);
-	data <<= 8;
-	data |= ILI9341_xchg_data(255);
-	return data;
-}
-
 void ILI9341_rd_dummy(void)
 {
 	volatile uint16_t data;
@@ -199,13 +182,13 @@ void ILI9341_rd_dummy(void)
 	data |= ILI9341_xchg_data(100);											// Dummy read
 }
 
-/* Set display rotation
+/* Set display rotation -> paragraph 8.2.29
  * 0 - up
  * 1 - right
  * 2 - down
  * 3 - left
  * */
-void ILI9341_set_rotation(uint8_t orientation)
+void ILI9341_set_rotation(uint8_t orientation)		// Pozycja obrazu
 {
     rotation = orientation;
 

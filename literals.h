@@ -1,7 +1,6 @@
 /*
  * literals.h
  *
- *  Author: kostuch@skeletondevices.com
  */ 
 
 

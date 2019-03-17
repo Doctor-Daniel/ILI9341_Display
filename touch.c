@@ -1,7 +1,6 @@
 ﻿/*
  * touch.c
  *
- *  Author: kostuch@skeletondevices.com
  */
 
 #include <avr/io.h>
@@ -39,16 +38,16 @@ point_t EEMEM ee_cal_points[3] =											// Three calibration points
 void XPT2046_init_io(void)
 {
     // This is already done in TFT section
-    TOUCH_MOSI_DIR |= TOUCH_MOSI;											// TFT_MOSI pin as output
-    TOUCH_SCK_DIR |= TOUCH_SCK;											// TFT_SCK pin as output
-    TOUCH_MOSI_PORT |= TOUCH_MOSI;										// Hi state
-    TOUCH_SCK_PORT |= TOUCH_SCK;
+    TOUCH_MOSI_DIR |= _BV(TOUCH_MOSI);											// TFT_MOSI pin as output
+    TOUCH_SCK_DIR |= _BV(TOUCH_SCK);											// TFT_SCK pin as output
+    TOUCH_MOSI_PORT |= _BV(TOUCH_MOSI);										// Hi state
+    TOUCH_SCK_PORT |= _BV(TOUCH_SCK);
 #if USE_TOUCH_CS == 1														// If TFT_CS in use
-    TOUCH_CS_DIR |= TOUCH_CS;
-    TOUCH_CS_PORT |= TOUCH_CS;
+    TOUCH_CS_DIR |= _BV(TOUCH_CS);
+    TOUCH_CS_PORT |= _BV(TOUCH_CS);
 #endif
-    TOUCH_IRQ_DIR &= ~TOUCH_IRQ;											// Input
-    TOUCH_IRQ_PORT |= TOUCH_IRQ;											// Pullup
+    TOUCH_IRQ_DIR &= ~(_BV(TOUCH_IRQ));											// Input
+    TOUCH_IRQ_PORT |= _BV(TOUCH_IRQ);											// Pullup
 };
 
 static inline void XPT2046_activate(void)

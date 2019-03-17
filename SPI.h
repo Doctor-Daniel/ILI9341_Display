@@ -1,7 +1,6 @@
 /*
  * SPI.h
  *
- *  Author: kostuch@skeletondevices.com
  */
 
 #ifndef SPI_H_

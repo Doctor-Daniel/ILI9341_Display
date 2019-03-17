@@ -37,8 +37,8 @@ int main(void)
 	XPT2046_init_io();						// inicjalizacja dotyku
 	XPT2046_rd_ee_cal();					// martryca kalibracji
 	ILI9341_set_rotation(LANDSCAPE);		// ustawienie obrazu w poziomie
-//	touch_calibration();					// odpalane jednorazowo aby skalibrowac dotyk i obraz.
-
+	//touch_calibration();					// odpalane jednorazowo aby skalibrowac dotyk i obraz.
+/*
 //	Test kolorow tla.	
 	ILI9341_cls(BLUE);
 	_delay_ms(500);
@@ -100,8 +100,8 @@ int main(void)
 	_delay_ms(1000);
 	
 	ILI9341_draw_triangle(0, 0, 200, 220, 100, 200, MAGENTA);	//trojkat
-	
-	ILI9341_draw_rectangle(10, 10, 150, 150, YELLOW);			// prostokat
+	*/
+	ILI9341_draw_rectangle(5, 5, 315, 235, YELLOW);			// prostokat
 	
     while (1) 
     {
@@ -113,6 +113,9 @@ int main(void)
 			ILI9341_draw_pixel(touch.x_cal - 1, touch.y_cal, GREEN);
 			ILI9341_draw_pixel(touch.x_cal, touch.y_cal - 1, GREEN);
 			ILI9341_draw_pixel(touch.x_cal, touch.y_cal + 1, GREEN);
+			
+			// instrukcja IF do zrobienia aktywnych pol pod guziki.
+			
 		}
     }
 }

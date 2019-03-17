@@ -1,86 +1,63 @@
 /*
  * ILI9341.h
  *
- *  Author: kostuch@skeletondevices.com
- */
+ * Created: 2018-11-06 22:21:06
+ * Author : Daniel
+ * 
+ * Podstawowe deklaracje pinow wyswietlacza TFT ILI9341
+ * Calosc oparta o sprzetowa szyne SPI
+ */ 
 
 #include <stdbool.h>
 
 #ifndef ILI9341_H_
 #define ILI9341_H_
 
-#define		TFT_WIDTH	320
-#define		TFT_HEIGHT	240
+#define	TFT_WIDTH	320
+#define	TFT_HEIGHT	240
 
-#define 	USE_TFT_CS	1
-#define		USE_HARD_SPI
+#define USE_TFT_CS	1
 
-//#ifdef		USE_HARD_SPI
-// PINs definitions (hardware SPI used here)
-#define		TFT_SCK		(1<<7)												// CLK	- robimy assigment dla 32
-#define 	TFT_MISO	(1<<6)												// MISO
-#define 	TFT_MOSI	(1<<5)												// MOSI
-#define 	TFT_RST		(1<<4)												// TFT_RST  - ten w sumie moze byc na stale do 3,3 V
-#define 	TFT_DC		(1<<3)												// D/C
-#define 	TFT_CS		(1<<2)												// CS
+#define	TFT_SCK		PB7												// SCK	-  Assigment dla ATMEGA 32
+#define TFT_MISO	PB6												// MISO
+#define TFT_MOSI	PB5												// MOSI
+#define TFT_RST		PB4												// RESET  - ten w sumie moze byc na stale do 3,3 V
+#define TFT_DC		PB3												// D/C	-	Data / Command
+#define TFT_CS		PB2												// CS	- Chip Select
 
-// PORTs definitions
-#define 	TFT_SCK_PORT	PORTB
-#define 	TFT_SCK_DIR		DDRB
-#define 	TFT_MOSI_PORT	PORTB
-#define 	TFT_MOSI_DIR	DDRB
-#define 	TFT_RST_PORT	PORTB
-#define 	TFT_RST_DIR		DDRB
-#define 	TFT_DC_PORT		PORTB
-#define 	TFT_DC_DIR		DDRB
-#define 	TFT_CS_PORT		PORTB
-#define 	TFT_CS_DIR		DDRB
-#define 	TFT_MISO_PORT	PORTB
-#define 	TFT_MISO_DIR	DDRB
+// Definicje portow - Wyswietlacz TDT na porcie B
+#define TFT_SCK_PORT	PORTB
+#define TFT_SCK_DDR		DDRB
+#define TFT_MOSI_PORT	PORTB
+#define TFT_MOSI_DDR	DDRB
+#define TFT_RST_PORT	PORTB
+#define TFT_RST_DDR		DDRB
+#define TFT_DC_PORT		PORTB
+#define TFT_DC_DDR		DDRB
+#define TFT_CS_PORT		PORTB
+#define TFT_CS_DDR		DDRB
+#define TFT_MISO_PORT	PORTB
+#define TFT_MISO_DDR	DDRB
+#define TFT_MISO_PIN	PINB	
 
-//#else
-//// PINs definitions (software SPI)
-//#define		TFT_SCK		(1<<5)												// CLK
-//#define 	TFT_MISO	(1<<4)												// MISO
-//#define 	TFT_MOSI	(1<<3)												// MOSI
-//#define 	TFT_RST		(1<<2)												// TFT_RST
-//#define 	TFT_DC		(1<<0)												// D/C
-//#define 	TFT_CS		(1<<7)												// CS
-//
-//// PORTs definitions
-//#define 	TFT_SCK_PORT	PORTB
-//#define 	TFT_SCK_DIR		DDRB
-//#define 	TFT_MOSI_PORT	PORTB
-//#define 	TFT_MOSI_DIR	DDRB
-//#define 	TFT_RST_PORT	PORTB
-//#define 	TFT_RST_DIR		DDRB
-//#define 	TFT_DC_PORT		PORTB
-//#define 	TFT_DC_DIR		DDRB
-//#define 	TFT_CS_PORT		PORTD
-//#define 	TFT_CS_DIR		DDRD
-//#define 	TFT_MISO_PORT	PORTB
-#define 	TFT_MISO_PIN	PINB
-//#define 	TFT_MISO_DIR	DDRB
-//#endif
 
-// MACROs definitions
-#define 	TFT_SCK_LO	TFT_SCK_PORT &= ~TFT_SCK
-#define 	TFT_SCK_HI	TFT_SCK_PORT |= TFT_SCK
-#define 	TFT_MOSI_LO	TFT_MOSI_PORT &= ~TFT_MOSI
-#define 	TFT_MOSI_HI	TFT_MOSI_PORT |= TFT_MOSI
-#define 	TFT_RST_LO	TFT_RST_PORT &= ~TFT_RST
-#define 	TFT_RST_HI	TFT_RST_PORT |= TFT_RST
-#define 	TFT_DC_LO	TFT_DC_PORT &= ~TFT_DC
-#define 	TFT_DC_HI	TFT_DC_PORT |= TFT_DC
-#define 	TFT_CS_LO	TFT_CS_PORT &= ~TFT_CS
-#define 	TFT_CS_HI	TFT_CS_PORT |= TFT_CS
-#define		TFT_MISO_X	TFT_MISO_PIN & TFT_MISO
+// Makra
+#define TFT_SCK_LO	TFT_SCK_PORT &= ~(_BV(TFT_SCK))
+#define TFT_SCK_HI	TFT_SCK_PORT |= _BV(TFT_SCK)
+#define TFT_MOSI_LO	TFT_MOSI_PORT &= ~(_BV(TFT_MOSI))
+#define TFT_MOSI_HI	TFT_MOSI_PORT |= _BV(TFT_MOSI)
+#define TFT_RST_LO	TFT_RST_PORT &= ~(_BV(TFT_RST))
+#define TFT_RST_HI	TFT_RST_PORT |= _BV(TFT_RST)
+#define TFT_DC_LO	TFT_DC_PORT &= ~(_BV(TFT_DC))
+#define TFT_DC_HI	TFT_DC_PORT |= _BV(TFT_DC)
+#define TFT_CS_LO	TFT_CS_PORT &= ~(_BV(TFT_CS))
+#define TFT_CS_HI	TFT_CS_PORT |= _BV(TFT_CS)
+#define	TFT_MISO_X	TFT_MISO_PIN & _BV(TFT_MISO)
 
-// Types & Variables
 enum direction_t {HORIZONTAL, VERTICAL, UP_SLOPE, DN_SLOPE};
 enum position_t {PORTRAIT = 0, LANDSCAPE = 1, PORTRAIT_REV = 2, LANDSCAPE_REV = 3};
 
-// TFT state (to be finished...)
+// Stan wyswietlacza TFT
 typedef struct
 {
 	uint16_t width;
@@ -103,7 +80,7 @@ uint8_t rotation;
 font_t current_font;
 tft_t tft_state;
 
-// Functions
+// Funkcje
 void ILI9341_init(void);
 void ILI9341_reset(void);
 void ILI9341_select(void);
@@ -138,7 +115,7 @@ void ILI9341_chr(uint16_t x, uint16_t y, char c);
 void ILI9341_txt(uint16_t x, uint16_t y, char *string);
 void ILI9341_txt_P(uint16_t x, uint16_t y, const char *string);
 
-/* Level 1 Commands (from the display Datasheet) */
+// Z Datashheta: adresy poszczegolnych komend
 #define ILI9341_NOP                             0x00
 #define ILI9341_SOFTWARE_RESET                  0x01
 #define ILI9341_READ_DISP_ID                    0x04
@@ -186,8 +163,6 @@ void ILI9341_txt_P(uint16_t x, uint16_t y, const char *string);
 #define ILI9341_READ_ID1                        0xDA
 #define ILI9341_READ_ID2                        0xDB
 #define ILI9341_READ_ID3                        0xDC
-
-/* Level 2 Commands (from the display Datasheet) */
 #define ILI9341_RGB_SIGNAL_CONTROL              0xB0
 #define ILI9341_FRAME_RATE_CONTROL_NORMAL       0xB1
 #define ILI9341_FRAME_RATE_CONTROL_IDLE_8COLOR  0xB2
