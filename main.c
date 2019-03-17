@@ -28,8 +28,10 @@
 
 void touch_calibration(void);
 void load_picture(const char *file_name, uint16_t x, uint16_t y);
+void set_layout(void);
 
 char driver_id_a[10];
+uint16_t drawColor = GREEN;
 
 int main(void)
 {
@@ -101,7 +103,7 @@ int main(void)
 	
 	ILI9341_draw_triangle(0, 0, 200, 220, 100, 200, MAGENTA);	//trojkat
 	*/
-	ILI9341_draw_rectangle(5, 5, 315, 235, YELLOW);			// prostokat
+	set_layout();
 	
     while (1) 
     {
@@ -109,15 +111,45 @@ int main(void)
 		
 		if (touch.ok)
 		{
-			ILI9341_draw_pixel(touch.x_cal, touch.y_cal, GREEN);
-			ILI9341_draw_pixel(touch.x_cal - 1, touch.y_cal, GREEN);
-			ILI9341_draw_pixel(touch.x_cal, touch.y_cal - 1, GREEN);
-			ILI9341_draw_pixel(touch.x_cal, touch.y_cal + 1, GREEN);
+			ILI9341_draw_pixel(touch.x_cal, touch.y_cal, drawColor);
+			ILI9341_draw_pixel(touch.x_cal - 1, touch.y_cal, drawColor);
+			ILI9341_draw_pixel(touch.x_cal, touch.y_cal - 1, drawColor);
+			ILI9341_draw_pixel(touch.x_cal, touch.y_cal + 1, drawColor);
 			
 			// instrukcja IF do zrobienia aktywnych pol pod guziki.
-			
+			if(touch.y_cal < 30)
+			{
+				if (touch.x_cal > 10 && touch.x_cal < 50)
+					drawColor = RED;
+				if (touch.x_cal > 60 && touch.x_cal < 100)
+					drawColor = GREEN;
+				if (touch.x_cal > 110 && touch.x_cal < 150)
+					drawColor = BLUE;
+				if (touch.x_cal > 160 && touch.x_cal < 200)
+					drawColor = YELLOW;
+				if (touch.x_cal > 210 && touch.x_cal < 250)
+					drawColor = CYAN;
+				if (touch.x_cal > 260 && touch.x_cal < 300)
+					{
+						ILI9341_cls(BLACK);
+						set_layout();		
+					}
+			}
 		}
     }
+}
+
+void set_layout(void)
+{
+	ILI9341_draw_rectangle(5, 30, 315, 235, YELLOW);			// prostokat
+	ILI9341_draw_fast_rect(10, 5, 40, 20, true, RED);			// czerwony
+	ILI9341_draw_fast_rect(60, 5, 40, 20, true, GREEN);		// zielony
+	ILI9341_draw_fast_rect(110, 5, 40, 20, true, BLUE);		// niebieski
+	ILI9341_draw_fast_rect(160, 5, 40, 20, true, YELLOW);		// zolty
+	ILI9341_draw_fast_rect(210, 5, 40, 20, true, CYAN);		// cyan
+	ILI9341_draw_fast_rect(260, 5, 40, 20, true, LGRAY);	// RESET
+	ILI9341_draw_line(260, 5, 300, 25, RED);
+	ILI9341_draw_line(300, 5, 260, 25, RED);				// iksik	
 }
 
 void touch_calibration(void)
