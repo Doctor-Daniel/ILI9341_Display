@@ -14,6 +14,7 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
+#include <avr/interrupt.h>
 #include <stdlib.h>
 #include "ILI9341.h"
 #include "colors.h"
@@ -23,21 +24,40 @@
 #include "font8x8.h"
 #include "font8x12.h"
 #include "literals.h"
+#include "bmp_color.h"
+// obsluga karty SD - biblioteki FATFS
+#include "diskio.h"
+#include "ff.h"
 
 #define PGM_GETSTR(str, idx) (char *)pgm_read_word(&str[idx])
 
 void touch_calibration(void);
 void load_picture(const char *file_name, uint16_t x, uint16_t y);
 void set_layout(void);
+void SDTimerInit(void)
+{
+	OCR0 = F_CPU / 1024 / 100 - 1;
+	TCCR0 = _BV(WGM01) | _BV(CS02) | _BV(CS00);
+	TIMSK = _BV(OCIE0);
+}
+ISR(TIMER0_COMP_vect)
+{
+	disk_timerproc();
+}
 
 char driver_id_a[10];
 uint16_t drawColor = GREEN;
+//FATFS fatFs;							// obiekt do ktorego zaladuje sie plik
 
 int main(void)
 {
     ILI9341_init();							// inicjalizacja wyswietlacza
 	XPT2046_init_io();						// inicjalizacja dotyku
 	XPT2046_rd_ee_cal();					// martryca kalibracji
+	SDTimerInit();							// Inicjacja timera do karty SD
+	sei();									// uruchomienie przerwan
+
+	PORTD |= _BV(PD3);						// To jest chyba od card detect, wiec mozna to spiac z 5V lub GND - musze wykminic
 	ILI9341_set_rotation(LANDSCAPE);		// ustawienie obrazu w poziomie
 	//touch_calibration();					// odpalane jednorazowo aby skalibrowac dotyk i obraz.
 /*
@@ -103,7 +123,12 @@ int main(void)
 	
 	ILI9341_draw_triangle(0, 0, 200, 220, 100, 200, MAGENTA);	//trojkat
 	*/
+
 	set_layout();
+	
+	// rysowanie grafiki
+//	load_picture("GRAFIKA.BIN", 0, 0);
+	//ILI9341_draw_color_bmp(120, 100, 32, 32, suzuki);
 	
     while (1) 
     {
@@ -132,7 +157,8 @@ int main(void)
 				if (touch.x_cal > 260 && touch.x_cal < 300)
 					{
 						ILI9341_cls(BLACK);
-						set_layout();		
+						//set_layout();
+						load_picture("ZOLW.BIN", 0, 0);		
 					}
 			}
 		}
@@ -198,5 +224,58 @@ void touch_calibration(void)
 	ILI9341_txt_P(0, 120, PGM_GETSTR(calibration_txt, cal_end_idx));
 }
 
-// void load_picture(const char *file_name, )		// na razie tego nie pisze, bo nie ma zaimplementowanej obslugi karty SD, tzn. PetitFS.
+void load_picture( const char *file_name, uint16_t x, uint16_t y)																
+{
+	FATFS fatFs;
+	ILI9341_set_font((font_t) {font16x16, 16, 16, YELLOW, TRANSPARENT});
+
+	while(PIND & _BV(PIND3) );
+	FRESULT fresult = f_mount(&fatFs, "", 1);
+		
+	if(fresult == FR_OK)
+	{
+		FIL fp;		// otwieramy plik do odczytu
+		fresult = f_open(&fp, file_name, FA_READ);
+		if (fresult == FR_OK)
+		{
+			char buffer[512];
+			UINT bytes_read;
+			uint8_t sector = 0;		// First sector										
+			uint8_t start_pos;
+			
+			do
+			{
+				bytes_read = 0;											// Bytes read so far
+				f_read(&fp, buffer, sizeof(buffer), &bytes_read);			// Read part of the file to buffer (sector 512b)
+
+				if (!(sector))											// If first (zero) sector
+				{
+					ILI9341_set_window(x, y, buffer[0] + (buffer[1] << 8) - 1, buffer[2] + (buffer[3] << 8) - 1);	// Set picture size
+					start_pos = 4;										// Data start at index 4
+				}
+				else start_pos = 0;										// Data start at index 0
+
+				// Check if it is full sector or part of it
+				for (uint16_t pixel = start_pos; pixel < (bytes_read % sizeof(buffer) ? bytes_read % sizeof(buffer) : sizeof(buffer)); pixel += 2)
+				{
+					ILI9341_push_color(buffer[pixel] + (buffer[pixel + 1] << 8));
+				}
+				sector++;
+			}
+			while (!(bytes_read % sizeof(buffer)));
+			f_close(&fp);
+		}
+		else
+		{
+			ILI9341_txt(10, 5, "Blad pliku");
+		}
+	}
+	else
+	{
+		ILI9341_txt(10, 5, "Blad karty");
+	}
+	// skasowana linia - oczekiwanie na wyjecie karty, a to zablokowaloby program.
+}
+	
+
 
